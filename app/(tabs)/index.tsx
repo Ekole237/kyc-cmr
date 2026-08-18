@@ -1,22 +1,25 @@
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { router } from "expo-router";
 import { FlatList, Pressable, StyleSheet, Text, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { PrimaryButton, RiskPill, SectionHeader, StatusPill } from "@/components/kyc-ui";
 import { ScreenContainer } from "@/components/screen-container";
 import { useKyc } from "@/lib/kyc-store";
 import type { KycCase } from "@/shared/kyc";
+import { getTabContentBottomPadding } from "@/shared/layout";
 
 function CaseRow({ item }: { item: KycCase }) {
   return <Pressable onPress={() => router.push({ pathname: "/cases/[id]", params: { id: item.id } })} style={({ pressed }) => [styles.caseRow, pressed && styles.pressed]}>
     <View style={styles.avatar}><Text style={styles.avatarText}>{item.fullName.split(" ").map((name) => name[0]).slice(0, 2).join("")}</Text></View>
-    <View style={styles.caseContent}><Text style={styles.caseName}>{item.fullName}</Text><Text style={styles.caseMeta}>{item.city} · {item.documentType}</Text><View style={styles.casePills}><StatusPill status={item.status} /><RiskPill risk={item.riskLevel} /></View></View>
+    <View style={styles.caseContent}><Text numberOfLines={1} style={styles.caseName}>{item.fullName}</Text><Text numberOfLines={1} style={styles.caseMeta}>{item.city} · {item.documentType}</Text><View style={styles.casePills}><StatusPill status={item.status} /><RiskPill risk={item.riskLevel} /></View></View>
     <MaterialIcons name="chevron-right" size={22} color="#8A9AAD" />
   </Pressable>;
 }
 
 export default function HomeScreen() {
   const { cases, reviewCount } = useKyc();
+  const insets = useSafeAreaInsets();
   const recentCases = cases.slice(0, 4);
   const completed = cases.filter((caseData) => caseData.status === "approved").length;
 
@@ -25,7 +28,7 @@ export default function HomeScreen() {
       data={recentCases}
       keyExtractor={(item) => item.id}
       renderItem={({ item }) => <CaseRow item={item} />}
-      contentContainerStyle={styles.listContent}
+      contentContainerStyle={[styles.listContent, { paddingBottom: getTabContentBottomPadding(insets.bottom) }]}
       ListHeaderComponent={<>
         <View style={styles.topline}><View><Text style={styles.eyebrow}>KYC CAMEROUN</Text><Text style={styles.greeting}>Bonjour, équipe KYC</Text></View><View style={styles.shield}><MaterialIcons name="verified-user" size={22} color="#0B2F5B" /></View></View>
         <View style={styles.hero}><View style={styles.heroCopy}><Text style={styles.heroOverline}>PILOTAGE DU JOUR</Text><Text style={styles.heroTitle}>{reviewCount > 0 ? `${reviewCount} dossier${reviewCount > 1 ? "s" : ""} à examiner` : "Aucun dossier bloqué"}</Text><Text style={styles.heroDescription}>Priorisez les dossiers nécessitant une intervention humaine et gardez une trace de chaque décision.</Text></View><View style={styles.heroScore}><Text style={styles.heroScoreNumber}>{cases.length}</Text><Text style={styles.heroScoreLabel}>dossiers</Text></View></View>
@@ -47,7 +50,7 @@ const styles = StyleSheet.create({
   greeting: { color: "#162230", fontSize: 23, lineHeight: 30, fontWeight: "900", marginTop: 2 },
   shield: { height: 43, width: 43, backgroundColor: "#EAF2FF", borderRadius: 14, alignItems: "center", justifyContent: "center" },
   hero: { backgroundColor: "#0B2F5B", borderRadius: 22, padding: 20, marginBottom: 16, flexDirection: "row", minHeight: 160, overflow: "hidden" },
-  heroCopy: { flex: 1, paddingRight: 10 },
+  heroCopy: { flex: 1, minWidth: 0, paddingRight: 10 },
   heroOverline: { color: "#AFC9EB", fontSize: 10, lineHeight: 14, fontWeight: "900", letterSpacing: 1.1 },
   heroTitle: { color: "#FFFFFF", fontSize: 23, lineHeight: 29, fontWeight: "900", marginTop: 7 },
   heroDescription: { color: "#D7E5F6", fontSize: 12.5, lineHeight: 18, marginTop: 8 },
@@ -64,7 +67,7 @@ const styles = StyleSheet.create({
   pressed: { opacity: 0.72 },
   avatar: { height: 44, width: 44, borderRadius: 15, backgroundColor: "#EAF2FF", alignItems: "center", justifyContent: "center" },
   avatarText: { color: "#0B2F5B", fontSize: 13, fontWeight: "900" },
-  caseContent: { flex: 1, gap: 2 },
+  caseContent: { flex: 1, minWidth: 0, gap: 2 },
   caseName: { color: "#162230", fontSize: 15, lineHeight: 20, fontWeight: "800" },
   caseMeta: { color: "#6D7C8F", fontSize: 12, lineHeight: 17 },
   casePills: { flexDirection: "row", gap: 6, marginTop: 4, flexWrap: "wrap" },

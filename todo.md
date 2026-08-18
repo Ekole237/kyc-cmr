@@ -12,3 +12,10 @@
 - [x] Écrire des tests déterministes des règles de statut, de risque et de décision.
 - [x] Générer l’icône, mettre à jour la configuration de marque et valider l’application avant livraison.
 - [x] Publier le MVP KYC Cameroun dans le dépôt GitHub Ekole237/kyc-cmr.
+- [x] Évaluer et documenter l’intégration de vérification de CNI camerounaise via un fournisseur KYC approuvé.
+- [x] Évaluer et documenter l’intégration de paiements Mobile Money MTN MoMo et Orange Money côté serveur.
+- [x] Corriger les problèmes de padding, de zone sûre et de débordement sur les écrans mobiles.
+- [x] Rédiger la documentation technique de l’application Expo/React Native.
+- [x] Rédiger le guide d’installation et de configuration locale du projet.
+- [x] Valider les correctifs de mise en page, la documentation et les tests.
+- [ ] Publier les correctifs et la documentation dans le dépôt GitHub.
