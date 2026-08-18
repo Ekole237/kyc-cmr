@@ -32,7 +32,7 @@ const env = {
   appSlug: "kyc-cameroon",
   // S3 URL of the app logo - set this to the URL returned by generate_image when creating custom logo
   // Leave empty to use the default icon from assets/images/icon.png
-  logoUrl: "",
+  logoUrl: "/manus-storage/kyc-cameroun-icon_878448c9.png",
   scheme: schemeFromBundleId,
   iosBundleId: bundleId,
   androidPackage: bundleId,
@@ -86,6 +86,12 @@ const config: ExpoConfig = {
   },
   plugins: [
     "expo-router",
+    [
+      "expo-camera",
+      {
+        "cameraPermission": "Autorisez KYC Cameroun à utiliser l’appareil photo pour préparer les captures de vérification.",
+      },
+    ],
     [
       "expo-audio",
       {
