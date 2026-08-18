@@ -24,6 +24,8 @@ pnpm test && pnpm check && pnpm lint
 | [`docs/INSTALLATION.md`](./docs/INSTALLATION.md) | Prérequis, installation, commandes de développement et mode démonstration. |
 | [`docs/TECHNICAL.md`](./docs/TECHNICAL.md) | Architecture, modèle métier, flux CNI, Mobile Money, webhooks et sécurité. |
 | [`docs/integration-research-notes.md`](./docs/integration-research-notes.md) | Notes et sources de recherche utilisées pour guider le choix des fournisseurs. |
+| [`docs/KYC_AUTONOMOUS.md`](./docs/KYC_AUTONOMOUS.md) | Rôles, parcours client, revue humaine, audit et limites de la plateforme sans fournisseur KYC. |
+| [`docs/PAYMENT_OPTIONS_FUTURE.md`](./docs/PAYMENT_OPTIONS_FUTURE.md) | Évaluation préliminaire de Maviance/Smobilpay, NotchPay et SupraPay sans intégration de paiement. |
 
 ## Limites du MVP
 

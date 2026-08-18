@@ -8,10 +8,11 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { PrimaryButton } from "@/components/kyc-ui";
 import { useKycTheme } from "@/hooks/use-kyc-theme";
 import { useKyc } from "@/lib/kyc-store";
+import { trpc } from "@/lib/trpc";
 import { getCameraHeaderPaddingTop, getCameraSheetPaddingBottom } from "@/shared/layout";
 
 export default function CaptureScreen() {
-  const params = useLocalSearchParams<{ id: string; mode: "document" | "selfie" }>();
+  const params = useLocalSearchParams<{ id: string; mode: "document" | "selfie"; source?: "client"; kind?: "identity_document" | "selfie" | "supporting_document" }>();
   const caseId = Array.isArray(params.id) ? params.id[0] : params.id;
   const mode = params.mode === "selfie" ? "selfie" : "document";
   const insets = useSafeAreaInsets();
@@ -20,23 +21,40 @@ export default function CaptureScreen() {
   const [permission, requestPermission] = useCameraPermissions();
   const [isReady, setIsReady] = useState(false);
   const [isCaptured, setIsCaptured] = useState(false);
+  const [capturedBase64, setCapturedBase64] = useState<string | null>(null);
   const { markEvidenceCaptured } = useKyc();
+  const upload = trpc.kyc.uploadEvidence.useMutation();
+  const isClientUpload = params.source === "client";
+  const evidenceKind = params.kind ?? (mode === "selfie" ? "selfie" : "identity_document");
   const title = mode === "document" ? "Cadrer la pièce" : "Cadrer le visage";
   const guidance = mode === "document" ? "Placez la CNI ou le passeport dans le cadre, sans reflet et avec les quatre coins visibles." : "Centrez le visage, gardez une bonne lumière et retirez tout élément qui le masque.";
 
   const capture = async () => {
     if (!cameraRef.current || !isReady) return;
     try {
-      await cameraRef.current.takePictureAsync({ quality: 0.65, exif: false, base64: false });
+      const result = await cameraRef.current.takePictureAsync({ quality: 0.65, exif: false, base64: isClientUpload });
+      if (isClientUpload && !result?.base64) throw new Error("La photo n’a pas pu être préparée pour le dépôt sécurisé.");
+      setCapturedBase64(result?.base64 ?? null);
       setIsCaptured(true);
     } catch { Alert.alert("Capture indisponible", "La photo n’a pas pu être prise. Vérifiez l’accès à l’appareil photo et réessayez."); }
   };
-  const confirm = () => { markEvidenceCaptured(caseId, mode); router.back(); };
+  const confirm = async () => {
+    try {
+      if (isClientUpload) {
+        if (!capturedBase64) throw new Error("Aucune photo n’est disponible.");
+        await upload.mutateAsync({ caseId, kind: evidenceKind, fileName: `${evidenceKind}-${Date.now()}.jpg`, mimeType: "image/jpeg", base64: capturedBase64 });
+        router.replace({ pathname: "/client/[id]", params: { id: caseId } } as never);
+        return;
+      }
+      markEvidenceCaptured(caseId, mode);
+      router.back();
+    } catch (error) { Alert.alert("Dépôt impossible", error instanceof Error ? error.message : "La preuve n’a pas pu être enregistrée."); }
+  };
 
   if (!permission) return <View style={[styles.permissionLoading, { backgroundColor: theme.background }]}><Text style={{ color: theme.muted }}>Préparation de l’appareil photo…</Text></View>;
-  if (!permission.granted) return <View style={[styles.permissionContainer, { backgroundColor: theme.background }]}><View style={[styles.permissionIcon, { backgroundColor: theme.surfaceAccent }]}><MaterialIcons name="camera-alt" size={34} color={theme.primary} /></View><Text style={[styles.permissionTitle, { color: theme.foreground }]}>Autoriser l’appareil photo</Text><Text style={[styles.permissionText, { color: theme.muted }]}>KYC Cameroun utilise l’appareil photo pour préparer la capture de document ou de selfie. Le MVP ne transmet pas de photo à un prestataire de vérification.</Text><PrimaryButton label="Autoriser la caméra" onPress={requestPermission} icon="camera-alt" /><Pressable onPress={() => router.back()} style={({ pressed }) => [styles.cancel, pressed && styles.pressed]}><Text style={[styles.cancelText, { color: theme.primary }]}>Annuler</Text></Pressable></View>;
+  if (!permission.granted) return <View style={[styles.permissionContainer, { backgroundColor: theme.background }]}><View style={[styles.permissionIcon, { backgroundColor: theme.surfaceAccent }]}><MaterialIcons name="camera-alt" size={34} color={theme.primary} /></View><Text style={[styles.permissionTitle, { color: theme.foreground }]}>Autoriser l’appareil photo</Text><Text style={[styles.permissionText, { color: theme.muted }]}>KYC Cameroun utilise l’appareil photo pour préparer la capture de document ou de selfie. La photo est déposée uniquement dans le dossier KYC lorsque vous la confirmez.</Text><PrimaryButton label="Autoriser la caméra" onPress={requestPermission} icon="camera-alt" /><Pressable onPress={() => router.back()} style={({ pressed }) => [styles.cancel, pressed && styles.pressed]}><Text style={[styles.cancelText, { color: theme.primary }]}>Annuler</Text></Pressable></View>;
 
-  return <View style={styles.container}><CameraView ref={cameraRef} facing={mode === "selfie" ? "front" : "back"} onCameraReady={() => setIsReady(true)} style={styles.camera}><View style={styles.overlay}><View style={[styles.header, { paddingTop: getCameraHeaderPaddingTop(insets.top) }]}><Pressable onPress={() => router.back()} style={({ pressed }) => [styles.close, pressed && styles.pressed]}><MaterialIcons name="close" size={22} color="#FFFFFF" /></Pressable><Text style={styles.headerTitle}>{mode === "document" ? "Pièce d’identité" : "Selfie de contrôle"}</Text><View style={styles.headerSpacer} /></View><View style={styles.guideArea}><View style={[styles.guideFrame, mode === "selfie" && styles.selfieFrame]} /></View><View style={[styles.bottomSheet, { backgroundColor: theme.surface, paddingBottom: getCameraSheetPaddingBottom(insets.bottom) }]}><Text style={[styles.captureTitle, { color: theme.foreground }]}>{isCaptured ? "Capture préparée" : title}</Text><Text style={[styles.captureText, { color: theme.muted }]}>{isCaptured ? "Vérifiez l’image puis confirmez l’étape." : guidance}</Text>{isCaptured ? <PrimaryButton label="Confirmer l’étape" onPress={confirm} icon="check" /> : <Pressable disabled={!isReady} onPress={capture} style={({ pressed }) => [styles.captureButton, { backgroundColor: theme.hero }, !isReady && styles.captureDisabled, pressed && isReady && styles.capturePressed]}><View style={[styles.captureInner, { backgroundColor: theme.surface }]} /></Pressable>}<Text style={[styles.demoNotice, { color: theme.muted }]}>{Platform.OS === "web" ? "La caméra peut être limitée dans la prévisualisation web." : "Aucune photo n’est envoyée dans cette démonstration."}</Text></View></View></CameraView></View>;
+  return <View style={styles.container}><CameraView ref={cameraRef} facing={mode === "selfie" ? "front" : "back"} onCameraReady={() => setIsReady(true)} style={styles.camera}><View style={styles.overlay}><View style={[styles.header, { paddingTop: getCameraHeaderPaddingTop(insets.top) }]}><Pressable onPress={() => router.back()} style={({ pressed }) => [styles.close, pressed && styles.pressed]}><MaterialIcons name="close" size={22} color="#FFFFFF" /></Pressable><Text style={styles.headerTitle}>{mode === "document" ? "Pièce d’identité" : "Selfie de contrôle"}</Text><View style={styles.headerSpacer} /></View><View style={styles.guideArea}><View style={[styles.guideFrame, mode === "selfie" && styles.selfieFrame]} /></View><View style={[styles.bottomSheet, { backgroundColor: theme.surface, paddingBottom: getCameraSheetPaddingBottom(insets.bottom) }]}><Text style={[styles.captureTitle, { color: theme.foreground }]}>{isCaptured ? "Capture préparée" : title}</Text><Text style={[styles.captureText, { color: theme.muted }]}>{isCaptured ? "Vérifiez l’image puis confirmez l’étape." : guidance}</Text>{isCaptured ? <PrimaryButton label={upload.isPending ? "Dépôt en cours…" : "Confirmer l’étape"} onPress={confirm} disabled={upload.isPending} icon="check" /> : <Pressable disabled={!isReady} onPress={capture} style={({ pressed }) => [styles.captureButton, { backgroundColor: theme.hero }, !isReady && styles.captureDisabled, pressed && isReady && styles.capturePressed]}><View style={[styles.captureInner, { backgroundColor: theme.surface }]} /></Pressable>}<Text style={[styles.demoNotice, { color: theme.muted }]}>{Platform.OS === "web" ? "La caméra peut être limitée dans la prévisualisation web." : isClientUpload ? "La photo est envoyée au dossier KYC uniquement après votre confirmation." : "Aucune photo n’est envoyée dans cette démonstration."}</Text></View></View></CameraView></View>;
 }
 
 const styles = StyleSheet.create({

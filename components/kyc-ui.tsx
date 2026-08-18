@@ -10,6 +10,8 @@ function getStatusTone(theme: KycTheme, status: KycStatus) {
     draft: { background: theme.surfaceSubtle, text: theme.muted },
     in_progress: { background: theme.surfaceAccent, text: theme.primary },
     submitted: { background: theme.warningSurface, text: theme.warningText },
+    in_review: { background: theme.reviewSurface, text: theme.reviewText },
+    needs_info: { background: theme.warningSurface, text: theme.warningText },
     approved: { background: theme.positiveSurface, text: theme.positiveText },
     needs_review: { background: theme.reviewSurface, text: theme.reviewText },
     rejected: { background: theme.dangerSurface, text: theme.dangerText },

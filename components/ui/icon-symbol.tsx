@@ -8,6 +8,7 @@ type IconSymbolName = keyof typeof MAPPING;
 
 const MAPPING = {
   "house.fill": "home",
+  "person.crop.circle.fill": "account-circle",
   "checklist": "checklist",
   "gearshape.fill": "settings",
   "paperplane.fill": "send",

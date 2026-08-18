@@ -22,3 +22,12 @@
 - [x] Harmoniser les palettes, surfaces et statuts KYC entre les modes clair et sombre.
 - [x] Vérifier les contrastes des écrans critiques dans les deux thèmes par des tests de palette et de styles.
 - [x] Publier les améliorations de thème dans le dépôt GitHub.
+- [x] Définir le périmètre de plateforme KYC autonome destiné à une démonstration fintech.
+- [x] Ajouter des rôles distincts pour client, agent KYC, responsable conformité et administrateur.
+- [x] Créer la persistance serveur des dossiers, décisions, événements d’audit et indicateurs de reporting.
+- [x] Créer le parcours client autonome de soumission et de suivi de dossier KYC.
+- [x] Ajouter le dépôt sécurisé de preuves de démonstration et leur accès contrôlé par rôle.
+- [x] Construire l’espace opérations pour revue, décision, règles de risque et reporting.
+- [x] Documenter les limites du KYC sans fournisseur et les options de paiement Maviance, NotchPay et SupraPay sans intégration.
+- [x] Tester la plateforme KYC autonome : tests, typage et linting validés.
+- [ ] Publier la plateforme KYC autonome dans le dépôt GitHub.

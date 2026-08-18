@@ -1,4 +1,4 @@
-export type KycStatus = "draft" | "in_progress" | "submitted" | "approved" | "needs_review" | "rejected";
+export type KycStatus = "draft" | "in_progress" | "submitted" | "in_review" | "needs_info" | "approved" | "needs_review" | "rejected";
 export type RiskLevel = "low" | "medium" | "high";
 export type DocumentType = "CNI" | "Passeport" | "Carte de séjour";
 export type DecisionType = "approved" | "needs_review" | "rejected";
@@ -51,6 +51,8 @@ export const STATUS_LABELS: Record<KycStatus, string> = {
   draft: "Brouillon",
   in_progress: "En cours",
   submitted: "À analyser",
+  in_review: "En revue",
+  needs_info: "Complément requis",
   approved: "Validé",
   needs_review: "Revue requise",
   rejected: "Non retenu",
