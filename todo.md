@@ -21,4 +21,4 @@
 - [x] Publier les correctifs et la documentation dans le dépôt GitHub.
 - [x] Harmoniser les palettes, surfaces et statuts KYC entre les modes clair et sombre.
 - [x] Vérifier les contrastes des écrans critiques dans les deux thèmes par des tests de palette et de styles.
-- [ ] Publier les améliorations de thème dans le dépôt GitHub.
+- [x] Publier les améliorations de thème dans le dépôt GitHub.
