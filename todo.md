@@ -18,4 +18,4 @@
 - [x] Rédiger la documentation technique de l’application Expo/React Native.
 - [x] Rédiger le guide d’installation et de configuration locale du projet.
 - [x] Valider les correctifs de mise en page, la documentation et les tests.
-- [ ] Publier les correctifs et la documentation dans le dépôt GitHub.
+- [x] Publier les correctifs et la documentation dans le dépôt GitHub.
