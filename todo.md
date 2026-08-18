@@ -30,4 +30,4 @@
 - [x] Construire l’espace opérations pour revue, décision, règles de risque et reporting.
 - [x] Documenter les limites du KYC sans fournisseur et les options de paiement Maviance, NotchPay et SupraPay sans intégration.
 - [x] Tester la plateforme KYC autonome : tests, typage et linting validés.
-- [ ] Publier la plateforme KYC autonome dans le dépôt GitHub.
+- [x] Publier la plateforme KYC autonome dans le dépôt GitHub.
