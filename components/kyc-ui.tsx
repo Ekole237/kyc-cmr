@@ -1,74 +1,78 @@
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { type ReactNode } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
-import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 
+import { useKycTheme, type KycTheme } from "@/hooks/use-kyc-theme";
 import { RISK_LABELS, STATUS_LABELS, type KycStatus, type RiskLevel } from "@/shared/kyc";
 
-const statusColors: Record<KycStatus, { background: string; text: string }> = {
-  draft: { background: "#EEF2F6", text: "#52606D" },
-  in_progress: { background: "#EAF2FF", text: "#1558A6" },
-  submitted: { background: "#FFF3DB", text: "#9A5B00" },
-  approved: { background: "#E8F7EF", text: "#137443" },
-  needs_review: { background: "#FFF0E8", text: "#B54708" },
-  rejected: { background: "#FCEBEB", text: "#B42318" },
-};
+function getStatusTone(theme: KycTheme, status: KycStatus) {
+  const tones: Record<KycStatus, { background: string; text: string }> = {
+    draft: { background: theme.surfaceSubtle, text: theme.muted },
+    in_progress: { background: theme.surfaceAccent, text: theme.primary },
+    submitted: { background: theme.warningSurface, text: theme.warningText },
+    approved: { background: theme.positiveSurface, text: theme.positiveText },
+    needs_review: { background: theme.reviewSurface, text: theme.reviewText },
+    rejected: { background: theme.dangerSurface, text: theme.dangerText },
+  };
+  return tones[status];
+}
 
-const riskColors: Record<RiskLevel, { background: string; text: string }> = {
-  low: { background: "#E8F7EF", text: "#137443" },
-  medium: { background: "#FFF3DB", text: "#9A5B00" },
-  high: { background: "#FCEBEB", text: "#B42318" },
-};
+function getRiskTone(theme: KycTheme, risk: RiskLevel) {
+  const tones: Record<RiskLevel, { background: string; text: string }> = {
+    low: { background: theme.positiveSurface, text: theme.positiveText },
+    medium: { background: theme.warningSurface, text: theme.warningText },
+    high: { background: theme.dangerSurface, text: theme.dangerText },
+  };
+  return tones[risk];
+}
 
 export function StatusPill({ status }: { status: KycStatus }) {
-  const tone = statusColors[status];
+  const theme = useKycTheme();
+  const tone = getStatusTone(theme, status);
   return <View style={[styles.pill, { backgroundColor: tone.background }]}><Text style={[styles.pillText, { color: tone.text }]}>{STATUS_LABELS[status]}</Text></View>;
 }
 
 export function RiskPill({ risk }: { risk: RiskLevel }) {
-  const tone = riskColors[risk];
+  const theme = useKycTheme();
+  const tone = getRiskTone(theme, risk);
   return <View style={[styles.pill, { backgroundColor: tone.background }]}><Text style={[styles.pillText, { color: tone.text }]}>Risque {RISK_LABELS[risk].toLowerCase()}</Text></View>;
 }
 
 export function PrimaryButton({ label, onPress, icon = "arrow-forward", disabled = false }: { label: string; onPress: () => void; icon?: keyof typeof MaterialIcons.glyphMap; disabled?: boolean }) {
-  return (
-    <Pressable disabled={disabled} onPress={onPress} style={({ pressed }) => [styles.primaryButton, disabled && styles.disabledButton, pressed && !disabled && styles.pressed]}>
-      <Text style={styles.primaryButtonText}>{label}</Text><MaterialIcons name={icon} size={19} color="#FFFFFF" />
-    </Pressable>
-  );
+  const theme = useKycTheme();
+  return <Pressable disabled={disabled} onPress={onPress} style={({ pressed }) => [styles.primaryButton, { backgroundColor: theme.hero }, disabled && styles.disabledButton, pressed && !disabled && styles.pressed]}><Text style={[styles.primaryButtonText, { color: theme.onPrimary }]}>{label}</Text><MaterialIcons name={icon} size={19} color={theme.onPrimary} /></Pressable>;
 }
 
 export function OutlineButton({ label, onPress, icon = "arrow-forward" }: { label: string; onPress: () => void; icon?: keyof typeof MaterialIcons.glyphMap }) {
-  return (
-    <Pressable onPress={onPress} style={({ pressed }) => [styles.outlineButton, pressed && styles.outlinePressed]}>
-      <Text style={styles.outlineButtonText}>{label}</Text><MaterialIcons name={icon} size={19} color="#0B2F5B" />
-    </Pressable>
-  );
+  const theme = useKycTheme();
+  return <Pressable onPress={onPress} style={({ pressed }) => [styles.outlineButton, { borderColor: theme.border, backgroundColor: theme.surface }, pressed && { backgroundColor: theme.surfaceSubtle, transform: [{ scale: 0.98 }] }]}><Text style={[styles.outlineButtonText, { color: theme.primary }]}>{label}</Text><MaterialIcons name={icon} size={19} color={theme.primary} /></Pressable>;
 }
 
 export function SectionHeader({ title, action, onAction }: { title: string; action?: string; onAction?: () => void }) {
-  return <View style={styles.sectionHeader}><Text style={styles.sectionTitle}>{title}</Text>{action && onAction ? <Pressable onPress={onAction} style={({ pressed }) => pressed && { opacity: 0.65 }}><Text style={styles.sectionAction}>{action}</Text></Pressable> : null}</View>;
+  const theme = useKycTheme();
+  return <View style={styles.sectionHeader}><Text style={[styles.sectionTitle, { color: theme.foreground }]}>{title}</Text>{action && onAction ? <Pressable onPress={onAction} style={({ pressed }) => pressed && { opacity: 0.65 }}><Text style={[styles.sectionAction, { color: theme.primary }]}>{action}</Text></Pressable> : null}</View>;
 }
 
 export function InfoCard({ icon, title, description, children }: { icon: keyof typeof MaterialIcons.glyphMap; title: string; description: string; children?: ReactNode }) {
-  return <View style={styles.infoCard}><View style={styles.infoIcon}><MaterialIcons name={icon} size={22} color="#0B2F5B" /></View><View style={styles.infoText}><Text style={styles.infoTitle}>{title}</Text><Text style={styles.infoDescription}>{description}</Text>{children}</View></View>;
+  const theme = useKycTheme();
+  return <View style={[styles.infoCard, { backgroundColor: theme.surface, borderColor: theme.border }]}><View style={[styles.infoIcon, { backgroundColor: theme.surfaceAccent }]}><MaterialIcons name={icon} size={22} color={theme.primary} /></View><View style={styles.infoText}><Text style={[styles.infoTitle, { color: theme.foreground }]}>{title}</Text><Text style={[styles.infoDescription, { color: theme.muted }]}>{description}</Text>{children}</View></View>;
 }
 
 const styles = StyleSheet.create({
   pill: { alignSelf: "flex-start", paddingHorizontal: 10, paddingVertical: 5, borderRadius: 999 },
   pillText: { fontSize: 12, lineHeight: 16, fontWeight: "700" },
-  primaryButton: { width: "100%", minHeight: 50, borderRadius: 14, paddingHorizontal: 18, backgroundColor: "#0B2F5B", flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 10 },
-  primaryButtonText: { color: "#FFFFFF", fontSize: 15, fontWeight: "800", flexShrink: 1, textAlign: "center" },
+  primaryButton: { width: "100%", minHeight: 50, borderRadius: 14, paddingHorizontal: 18, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 10 },
+  primaryButtonText: { fontSize: 15, fontWeight: "800", flexShrink: 1, textAlign: "center" },
   disabledButton: { opacity: 0.45 },
   pressed: { opacity: 0.92, transform: [{ scale: 0.98 }] },
-  outlineButton: { width: "100%", minHeight: 50, borderRadius: 14, paddingHorizontal: 18, borderWidth: 1, borderColor: "#B9C9DD", flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 10, backgroundColor: "#FFFFFF" },
-  outlineButtonText: { color: "#0B2F5B", fontSize: 15, fontWeight: "800" },
-  outlinePressed: { backgroundColor: "#F4F7FB", transform: [{ scale: 0.98 }] },
+  outlineButton: { width: "100%", minHeight: 50, borderRadius: 14, paddingHorizontal: 18, borderWidth: 1, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 10 },
+  outlineButtonText: { fontSize: 15, fontWeight: "800" },
   sectionHeader: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginTop: 26, marginBottom: 12 },
-  sectionTitle: { color: "#162230", fontSize: 17, lineHeight: 22, fontWeight: "800" },
-  sectionAction: { color: "#1558A6", fontSize: 13, fontWeight: "800" },
-  infoCard: { flexDirection: "row", alignItems: "flex-start", backgroundColor: "#FFFFFF", borderWidth: 1, borderColor: "#E3EAF2", borderRadius: 16, padding: 14, gap: 12 },
-  infoIcon: { height: 40, width: 40, borderRadius: 12, backgroundColor: "#EAF2FF", alignItems: "center", justifyContent: "center" },
+  sectionTitle: { fontSize: 17, lineHeight: 22, fontWeight: "800" },
+  sectionAction: { fontSize: 13, fontWeight: "800" },
+  infoCard: { flexDirection: "row", alignItems: "flex-start", borderWidth: 1, borderRadius: 16, padding: 14, gap: 12 },
+  infoIcon: { height: 40, width: 40, borderRadius: 12, alignItems: "center", justifyContent: "center" },
   infoText: { flex: 1, minWidth: 0, gap: 3 },
-  infoTitle: { color: "#162230", fontSize: 15, lineHeight: 20, fontWeight: "800" },
-  infoDescription: { color: "#66758A", fontSize: 13, lineHeight: 18 },
+  infoTitle: { fontSize: 15, lineHeight: 20, fontWeight: "800" },
+  infoDescription: { fontSize: 13, lineHeight: 18 },
 });

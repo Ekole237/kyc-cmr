@@ -19,3 +19,6 @@
 - [x] Rédiger le guide d’installation et de configuration locale du projet.
 - [x] Valider les correctifs de mise en page, la documentation et les tests.
 - [x] Publier les correctifs et la documentation dans le dépôt GitHub.
+- [x] Harmoniser les palettes, surfaces et statuts KYC entre les modes clair et sombre.
+- [x] Vérifier les contrastes des écrans critiques dans les deux thèmes par des tests de palette et de styles.
+- [ ] Publier les améliorations de thème dans le dépôt GitHub.
