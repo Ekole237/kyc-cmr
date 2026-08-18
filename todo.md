@@ -11,4 +11,4 @@
 - [x] Préparer les points d’intégration vers un fournisseur KYC, sans collecte ou vérification réelle avant configuration.
 - [x] Écrire des tests déterministes des règles de statut, de risque et de décision.
 - [x] Générer l’icône, mettre à jour la configuration de marque et valider l’application avant livraison.
-- [ ] Publier le MVP KYC Cameroun dans le dépôt GitHub Ekole237/kyc-cmr.
+- [x] Publier le MVP KYC Cameroun dans le dépôt GitHub Ekole237/kyc-cmr.
